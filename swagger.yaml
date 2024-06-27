@@ -1,0 +1,214 @@
+openapi: 3.0.0
+info:
+  title: LMS API
+  description: API for managing courses and chapters in an LMS
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+tags:
+  - name: Courses
+    description: The courses managing API
+  - name: Chapters
+    description: The chapters managing API
+components:
+  schemas:
+    Course:
+      type: object
+      required:
+        - title
+        - createdAt
+        - updatedAt
+        - userId
+      properties:
+        id:
+          type: integer
+          description: The auto-generated id of the course
+        title:
+          type: string
+          description: The title of the course
+        createdAt:
+          type: string
+          format: date-time
+          description: The date the course was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date the course was last updated
+        userId:
+          type: integer
+          description: The id of the user who created the course
+      example:
+        id: 1
+        title: Introduction to Node.js
+        createdAt: '2024-06-27T00:00:00.000Z'
+        updatedAt: '2024-06-27T00:00:00.000Z'
+        userId: 1
+    Chapter:
+      type: object
+      required:
+        - title
+        - courseId
+      properties:
+        id:
+          type: integer
+          description: The auto-generated id of the chapter
+        title:
+          type: string
+          description: The title of the chapter
+        courseId:
+          type: integer
+          description: The id of the course the chapter belongs to
+        description:
+          type: string
+          description: The description of the chapter
+        videoUrl:
+          type: string
+          description: The URL of the video for the chapter
+      example:
+        id: 1
+        title: Introduction to Node.js
+        courseId: 1
+        description: 'This chapter covers the basics of Node.js'
+        videoUrl: 'http://example.com/video'
+paths:
+  /api/courses/published:
+    get:
+      summary: Returns the list of all published courses
+      tags: [Courses]
+      responses:
+        200:
+          description: The list of the published courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+  /api/courses/all:
+    get:
+      summary: Returns the list of all courses
+      tags: [Courses]
+      responses:
+        200:
+          description: The list of the courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+  /api/courses/{id}:
+    get:
+      summary: Get a course by id
+      tags: [Courses]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The course id
+      responses:
+        200:
+          description: The course description by id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        404:
+          description: The course was not found
+  /api/chapters/{courseId}:
+    get:
+      summary: Get all chapters by course id
+      tags: [Chapters]
+      parameters:
+        - in: path
+          name: courseId
+          schema:
+            type: integer
+          required: true
+          description: The id of the course
+      responses:
+        200:
+          description: The list of the chapters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chapter'
+        404:
+          description: The course was not found
+  /api/chapter/create:
+    post:
+      summary: Create a new chapter
+      tags: [Chapters]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chapter'
+      responses:
+        200:
+          description: The chapter was successfully created
+        500:
+          description: Some server error
+  /api/chapter/{id}:
+    delete:
+      summary: Remove the chapter by id
+      tags: [Chapters]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The chapter id
+      responses:
+        200:
+          description: The chapter was deleted
+        404:
+          description: The chapter was not found
+    put:
+      summary: Update the chapter by id
+      tags: [Chapters]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The chapter id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Chapter'
+      responses:
+        200:
+          description: The chapter was updated
+        404:
+          description: The chapter was not found
+        500:
+          description: Some error happened
+    get:
+      summary: Get the chapter by id
+      tags: [Chapters]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The chapter id
+      responses:
+        200:
+          description: The chapter description by id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chapter'
+        404:
+          description: The chapter was not found
